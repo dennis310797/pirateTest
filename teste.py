@@ -1,20 +1,29 @@
-import time
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import pandas as pd
 
-driver = webdriver.Chrome('C:/Users/denni/OneDrive/Documentos/chromedriver_win32/chromedriver')
-driver.get('https://www.4devs.com.br/gerador_de_numeros_aleatorios')
-time.sleep(1)
-#search_box = driver.find_element_by_xpath("//div[@class='card card--xl medium-4 columns']//a[@href='/gerador_de_cpf']").click()
-search_box = driver.find_element_by_xpath("//div[@id='area_resposta']//tbody")
-html=search_box.get_attribute('outerHTML')
+def codigo_nfe(url):
+    #1- USANDO O SELENIUM PARA FAZER O REQUEST
+    page = webdriver.Chrome('.\chromedriver.exe')
+    page.get(url)
 
-soup=BeautifulSoup(html,'html.parser')
-table=soup.find(name='tbody')
+    #2- RECEBENDO O HTML
+    soup=BeautifulSoup(page.page_source,'html.parser')
+    
+    #3- SELECIONANDO A TAG TBODY E PROCURANDO NA TABELA TODOS ELEMENTOS DA TAG 'TR'
+    table = soup.find(name='tbody').find_all(name='tr')
 
-#df_full=pd.read_html(str(table))[0].head(5)
-print(type(table))
+    #4- USANDO A BIBLIOTECA PANDAS PARA LER O HTML DA TABELA
+    df_full=pd.read_html(str(soup))[0].head(len(table))
 
-time.sleep(1)
-driver.quit() 
+    #5- APRESENTANDO A TABELA
+    print(df_full)
+    print("\n*********************************************")
+    print(f"Selecionando um elemento da tabela: {df_full.UF[21:22]}")
+    print("*********************************************")
+
+
+    page.quit()
+if __name__ == '__main__':
+    url='https://www.oobj.com.br/bc/article/quais-os-c%C3%B3digos-de-cada-uf-no-brasil-465.html'
+    codigo_nfe(url)
